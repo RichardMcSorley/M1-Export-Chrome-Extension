@@ -14,3 +14,14 @@ Now you can easliy upload it to [simply safe dividends](simplysafedividends.com)
 2. In Chrome the  Menu -> More tools -> Extensions -> Enable "Developer mode".
 
 3. Finally click “Load unpacked” and find where you saved the unzipped folder.
+
+## How to Use
+
+1. Login to [M1 Finance](https://m1.finance)
+
+2. Holdings ->  Right click anywhere on the page -> Copy/Save Holdings -> Save to CSV
+
+3. ???
+
+4. Profit
+
