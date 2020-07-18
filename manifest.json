@@ -1,5 +1,5 @@
 {
-    "name": "Copy/Save M1 holdings",
+    "name": "M1 Export",
     "description": "An easy way to copy your M1 finance holdings to a spreadsheet or to your clipboard.",
     "version": "1.0",
     "manifest_version": 2,
