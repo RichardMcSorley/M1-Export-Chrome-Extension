@@ -11,17 +11,19 @@ Now you can easliy upload it to [simply safe dividends](simplysafedividends.com)
 
 1. [Download Zip](https://github.com/RichardMcSorley/M1-Export-Chrome-Extension/archive/master.zip)  and unzip to an easy to find location.
 
-2. In Chrome the  Menu -> More tools -> Extensions -> Enable "Developer mode".
+2. In Chrome go to [chrome://extensions](chrome://extensions) -> Enable "Developer Mode"
 
-3. Finally click “Load unpacked” and find where you saved the unzipped folder.
+> Alternatively go to Menu -> More tools -> Extensions -> Enable "Developer mode".
+
+3. Finally click “Load unpacked” and open the unzipped folder in step 1.
 
 ## How to Use
 
 1. Login to [M1 Finance](https://m1.finance)
 
-2. Holdings ->  Right click anywhere on the page -> Copy/Save Holdings -> Save to CSV
+2. Click on Holdings ->  Right click anywhere on the page -> ![icon](./images/16.png) Export Holdings -> Save to CSV
 
-3. ??? / Load into [simply safe dividends](simplysafedividends.com)
+3. ??? / Maybe import into [simply safe dividends](simplysafedividends.com)
 
 4. Profit
 
