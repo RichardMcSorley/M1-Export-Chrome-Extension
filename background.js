@@ -10,7 +10,7 @@ function send(type) {
 
 chrome.contextMenus.create({
     id: "m1ToCSV",
-    title: "Copy/Save Holdings",
+    title: "Export Holdings",
     documentUrlPatterns
 });
 

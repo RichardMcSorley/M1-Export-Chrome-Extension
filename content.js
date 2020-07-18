@@ -1,13 +1,13 @@
+const ROW_LENGTH = 11;
+
 chrome.runtime.onMessage.addListener(function (request) {
     if (request === "save") save();
     if (request === "copy") copy();
 });
 
-function getData() {
-    const commaRows = [];
-    const tabbedRows = [];
+function getData(joinRowsBy) {
     // First 3 lines of headers should not move, the order is to support simply safe dividends
-    const headers = [
+    let headers = [
         "Ticker",
         "Shares",
         "Avg. Price",
@@ -17,63 +17,72 @@ function getData() {
         "Unrealized Gain %",
         "Value"
     ];
+    let rows = [];
 
     try {
-        // Find row elements -> find values in each row -> extract text
-        const rows = [
-            ...document.querySelectorAll('a[href*="position"]')
-        ].map(elm =>
-            [...elm.querySelectorAll("span")].map(elm => elm.textContent)
-        );
-
-        rows.forEach(row => {
-            const [
-                ticker, // MAIN
-                name, // Main Street Capital Corp.
-                shares, // 12.63455
-                price, // $30.32
-                maintenance, // 45%
-                gain, // +$18.31 (▲4.78%)
-                gain1, // +$18.31
-                gain2, // ▲4.78%
-                gain3, // ▲
-                gain4, // 4.78%
-                value // $401.40
-            ] = row;
-
-            const newRow = [
-                // First 3 lines  should not move, the order is to support simply safe dividends
-                ticker,
-                shares,
-                price,
-                name.replace(",", ""), // escape , for CSV. Ex. CompanyName , Inc.
-                maintenance,
-                gain1.replace("+", ""), // remove + value, most spreadsheet software interpret no value as positive
-                gain2.replace("▲", "").replace("▼", "-"), // replace symbols with positive or negative values
-                value
-            ];
-            commaRows.push(newRow.join(","));
-            tabbedRows.push(newRow.join("\t"));
-        });
+        rows = getPositions();
+        // Theres no data to export
+        if (rows.length === 0) throw "Could not find positions on this page!";
+        // Remove headers because our output was greater than expected
+        if (rows[0].length !== ROW_LENGTH) headers = [];
+        // now map the rows
+        rows = rows.map(row => mapPositionValue(row, joinRowsBy));
     } catch (error) {
         console.error(error);
-        commaRows.push(["Error getting holdings"]);
-        tabbedRows.push(["Error getting holdings"]);
+        headers = ["Error", "Error Message"];
+        rows = [
+            ["Something went wrong.", JSON.stringify(error)].join(joinRowsBy)
+        ];
     }
+    return { headers, rows };
+}
 
-    return {
-        headers,
-        tabbedRows,
-        commaRows
-    };
+function getPositions() {
+    return [...document.querySelectorAll('a[href*="position"]')].map(elm =>
+        [...elm.querySelectorAll("span")].map(elm => elm.textContent)
+    );
+}
+
+function mapPositionValue(row, joinRowsBy) {
+    const sanitized = sanitize(row);
+    // More rows than we expect! Panic and return everything! Likely out of order
+    if (sanitized.length !== ROW_LENGTH) return sanitized.join(joinRowsBy);
+
+    const [
+        ticker, // MAIN
+        name, // Main Street Capital Corp.
+        shares, // 12.63455
+        price, // $30.32
+        maintenance, // 45%
+        _gain, // +$18.31 (▲4.78%)
+        gain1, // +$18.31
+        gain2, // ▲4.78%
+        _gain3, // ▲
+        _gain4, // 4.78%
+        value // $401.40
+    ] = sanitized;
+
+    return [
+        // First 3 lines  should not move, the order is to support simply safe dividends
+        ticker,
+        shares,
+        price,
+        name,
+        maintenance,
+        gain1,
+        gain2,
+        value
+    ].join(joinRowsBy);
+}
+
+function sanitize(row) {
+    return row.map(v => v.replace(/\,|\+|\▲/g, "").replace("▼", "-"));
 }
 
 function save() {
-    const { commaRows, headers } = getData();
+    const { headers, rows } = getData(",");
     const encodedUri = encodeURI(
-        `data:text/csv;charset=utf-8,${headers.join(",")}\n${commaRows.join(
-            "\n"
-        )}`
+        `data:text/csv;charset=utf-8,${headers.join(",")}\n${rows.join("\n")}`
     );
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
@@ -85,9 +94,9 @@ function save() {
 }
 
 function copy() {
-    const { tabbedRows, headers } = getData();
+    const { headers, rows } = getData("\t");
     navigator.clipboard
-        .writeText(`${headers.join("\t")}\n${tabbedRows.join("\n")}`)
+        .writeText(`${headers.join("\t")}\n${rows.join("\n")}`)
         .then(
             () => {
                 console.log("Copied holdings into clipboard.");

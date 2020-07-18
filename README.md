@@ -21,7 +21,7 @@ Now you can easliy upload it to [simply safe dividends](simplysafedividends.com)
 
 2. Holdings ->  Right click anywhere on the page -> Copy/Save Holdings -> Save to CSV
 
-3. ???
+3. ??? / Load into [simply safe dividends](simplysafedividends.com)
 
 4. Profit
 
