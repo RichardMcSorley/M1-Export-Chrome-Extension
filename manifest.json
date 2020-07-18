@@ -10,7 +10,7 @@
         },
     "content_scripts": [
         {
-            "matches": ["https://dashboard.m1finance.com/d/invest/holdings"],
+            "matches": ["https://*.m1finance.com/*"],
             "js": ["content.js"]
         }
     ],
