@@ -1,0 +1,24 @@
+{
+    "name": "Copy/Save M1 holdings",
+    "description": "An easy way to copy your M1 finance holdings to a spreadsheet or to your clipboard.",
+    "version": "1.0",
+    "manifest_version": 2,
+    "permissions": ["contextMenus"],
+    "background":
+        {
+            "scripts": ["background.js"]
+        },
+    "content_scripts": [
+        {
+            "matches": ["https://dashboard.m1finance.com/d/invest/holdings"],
+            "js": ["content.js"]
+        }
+    ],
+    "icons": {
+      "16": "images/16.png",
+      "32": "images/32.png",
+      "48": "images/48.png",
+      "128": "images/128.png"
+    }
+}
+
