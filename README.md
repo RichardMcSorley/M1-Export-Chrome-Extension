@@ -1,5 +1,7 @@
 # ![icon](./images/16.png) M1 Export - Chrome Extension
 
+Now on the Chrome Web Store [get it here](https://chrome.google.com/webstore/detail/m1-export/iapcldfhefinjhjmeinjoidaahefljgj)!
+
 Copy M1 finance portfolio to a CSV or to the clipboard.
 
 ![Screenshot](./images/screenshot_1.png)
