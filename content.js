@@ -1,4 +1,4 @@
-const ROW_LENGTH = 11;
+const ROW_LENGTH = 12;
 
 chrome.runtime.onMessage.addListener(function (request) {
     if (request === "save") save();
