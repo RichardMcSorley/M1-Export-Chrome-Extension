@@ -9,10 +9,10 @@ function getData(joinRowsBy) {
     // First 3 lines of headers should not move, the order is to support simply safe dividends
     let headers = [
         "Ticker",
+        "Name",
         "Shares",
         "Avg. Price",
-        "Name",
-        "Maintenance",
+        "Cost Basis",
         "Unrealized Gain",
         "Unrealized Gain %",
         "Value"
@@ -53,6 +53,7 @@ function mapPositionValue(row, joinRowsBy) {
         name, // Main Street Capital Corp.
         shares, // 12.63455
         price, // $30.32
+        costBasis, // $380.00
         maintenance, // 45%
         _gain, // +$18.31 (▲4.78%)
         gain1, // +$18.31
@@ -65,10 +66,10 @@ function mapPositionValue(row, joinRowsBy) {
     return [
         // First 3 lines  should not move, the order is to support simply safe dividends
         ticker,
+        name,
         shares,
         price,
-        name,
-        maintenance,
+        costBasis,
         gain1,
         gain2,
         value
