@@ -1,22 +1,52 @@
 const ROW_LENGTH = 12;
 
+const HEADERS = {
+  m1: [
+      "Ticker",
+      "Name",
+      "Shares",
+      "Avg. Price",
+      "Cost Basis",
+      "Unrealized Gain",
+      "Unrealized Gain %",
+      "Value"
+  ],
+  // Simply Safe requires the first 3 headers to be ticker,
+  // shares, and avg. price.
+  ss: [
+      "Ticker",
+      "Shares",
+      "Avg. Price",
+      "Name",
+      "Cost Basis",
+      "Unrealized Gain",
+      "Unrealized Gain %",
+      "Value"
+  ]
+}
+
 chrome.runtime.onMessage.addListener(function (request) {
-    if (request === "save") save();
-    if (request === "copy") copy();
+    switch(request) {
+        case "m1.save":
+            save('m1');
+            break;
+        case "m1.copy":
+            copy('m1');
+            break;
+        case "ss.save":
+            save('ss');
+            break;
+        case "ss.copy":
+            copy('ss');
+            break;
+        default:
+            break;
+    }
 });
 
-function getData(joinRowsBy) {
-    // First 3 lines of headers should not move, the order is to support simply safe dividends
-    let headers = [
-        "Ticker",
-        "Name",
-        "Shares",
-        "Avg. Price",
-        "Cost Basis",
-        "Unrealized Gain",
-        "Unrealized Gain %",
-        "Value"
-    ];
+// format: 'ss' or 'm1', determines what order the data is in.
+function getData(joinRowsBy, format) {
+    let headers = HEADERS[format];
     let rows = [];
 
     try {
@@ -26,7 +56,7 @@ function getData(joinRowsBy) {
         // Remove headers because our output was greater than expected
         if (rows[0].length !== ROW_LENGTH) headers = [];
         // now map the rows
-        rows = rows.map(row => mapPositionValue(row, joinRowsBy));
+        rows = rows.map(row => mapPositionValue(row, joinRowsBy, format));
     } catch (error) {
         console.error(error);
         headers = ["Error", "Error Message"];
@@ -43,7 +73,8 @@ function getPositions() {
     );
 }
 
-function mapPositionValue(row, joinRowsBy) {
+// format: 'ss' or 'm1', determines what order the data is in.
+function mapPositionValue(row, joinRowsBy, format) {
     const sanitized = sanitize(row);
     // More rows than we expect! Panic and return everything! Likely out of order
     if (sanitized.length !== ROW_LENGTH) return sanitized.join(joinRowsBy);
@@ -63,25 +94,38 @@ function mapPositionValue(row, joinRowsBy) {
         value // $401.40
     ] = sanitized;
 
-    return [
-        // First 3 lines  should not move, the order is to support simply safe dividends
-        ticker,
-        name,
-        shares,
-        price,
-        costBasis,
-        gain1,
-        gain2,
-        value
-    ].join(joinRowsBy);
+    let output = format === 'ss' ?
+        [
+            ticker,
+            shares,
+            price,
+            name,
+            costBasis,
+            gain1,
+            gain2,
+            value
+        ]
+        :
+        [
+            ticker,
+            name,
+            shares,
+            price,
+            costBasis,
+            gain1,
+            gain2,
+            value
+        ]
+    return output.join(joinRowsBy)
 }
 
 function sanitize(row) {
     return row.map(v => v.replace(/\,|\+|\▲/g, "").replace("▼", "-"));
 }
 
-function save() {
-    const { headers, rows } = getData(",");
+// format: 'ss' or 'm1', determines what order the data is in.
+function save(format) {
+    const { headers, rows } = getData(",", format);
     const encodedUri = encodeURI(
         `data:text/csv;charset=utf-8,${headers.join(",")}\n${rows.join("\n")}`
     );
@@ -94,8 +138,9 @@ function save() {
     console.log("Saved holdings to CSV.");
 }
 
-function copy() {
-    const { headers, rows } = getData("\t");
+// format: 'ss' or 'm1', determines what order the data is in.
+function copy(format) {
+    const { headers, rows } = getData("\t", format);
     navigator.clipboard
         .writeText(`${headers.join("\t")}\n${rows.join("\n")}`)
         .then(
